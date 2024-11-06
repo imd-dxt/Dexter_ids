@@ -2,7 +2,7 @@ import socket
 import struct
 import sys
 import argparse
-from classs import EthernetFrame
+from classs import EthernetFrame,IPV4,TCP
 
 def get_args():
     parser = argparse.ArgumentParser(description="A simple network sniffer")
@@ -15,22 +15,20 @@ def main(interface):
    s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(ETH_P_ALL))
    s.bind((interface,0))
    while True:
-      raw_data, addr = s.recvfrom(65530)
-      eth = EthernetFrame(raw_data)
-      print(f"[ Ethernet - {eth.ETHER_TYPE}; Source: {eth.SOURCE}; Dest: {eth.DESTINATION}; Data: {eth.Data} ]")
-      ipv4_info = eth.parse_ipv4()
-      if eth.ETHER_TYPE == EthernetFrame.ID:
-            print("IPv4 Packet:")
-            print(f"  - Version: {eth.VERSION}")
-            print(f"  - Header Length: {eth.IHL * 4} bytes")
-            print(f"  - Total Length: {eth.LENGTH}")
-            print(f"  - TTL: {eth.TTL}")
-            print(f"  - Protocol: {eth.PROTOCOL}")
-            print(f"  - Source IP: {eth.ipv4_to_str(eth.SOURCE)}")
-            print(f"  - Destination IP: {eth.ipv4_to_str(eth.DESTINATION)}")
-            print(f"  - Payload: {eth.PAYLOAD[:20]}...")  # Print a snippet of the payload for brevity
+        raw_data, addr = s.recvfrom(65535)  # Capture packet data
+        eth = EthernetFrame(raw_data)  # Parse the Ethernet frame
 
-      print("-" * 50)  # Divider between packets
+        # Print Ethernet frame details
+        print(f"[*] Ethernet - {hex(eth.ETHER_TYPE)}; Source: {eth.SOURCE}; Dest: {eth.DESTINATION}; Data: {eth.Data[:20]}... ")
+
+        if eth.ETHER_TYPE == IPV4.ID:
+            ipv4 = IPV4(eth.Data)
+            print("->" + ipv4.parse_())  # Use the parse_ method of the IPV4 instance
+            if ipv4.PROTOCOL == TCP.ID:
+                    tcp = TCP(ipv4.PAYLOAD)
+                    print("   └─ " + tcp.parse_tcp())
+                    
+        print("-" * 50)  
 if __name__ == "__main__":
    args=get_args()
    main(args.interface)
