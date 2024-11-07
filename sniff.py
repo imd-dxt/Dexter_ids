@@ -1,9 +1,10 @@
 import socket
+import argparse
 import struct
 import sys
-import argparse
 from classs import EthernetFrame,IPV4,TCP
-
+from colorama import Fore,init
+init()
 def get_args():
     parser = argparse.ArgumentParser(description="A simple network sniffer")
     parser.add_argument('interface', help="Network interface to sniff on")
@@ -19,7 +20,7 @@ def main(interface):
         eth = EthernetFrame(raw_data)  # Parse the Ethernet frame
 
         # Print Ethernet frame details
-        print(f"[*] Ethernet - {hex(eth.ETHER_TYPE)}; Source: {eth.SOURCE}; Dest: {eth.DESTINATION}; Data: {eth.Data[:20]}... ")
+        print(Fore.GREEN +f"[*] Ethernet - {hex(eth.ETHER_TYPE)}; Source: {eth.SOURCE}; Dest: {eth.DESTINATION}; Data: {eth.Data[:20]}... ")
 
         if eth.ETHER_TYPE == IPV4.ID:
             ipv4 = IPV4(eth.Data)

@@ -1,6 +1,4 @@
 # classs.py
-
-import socket
 import struct
 
 class EthernetFrame:
@@ -119,4 +117,7 @@ class TCP:
         for key in self.FLAGS:
             if self.FLAGS[key]:
                 flags.append(key)
-         return f"[ TCP - Source Port: {self.SRC_PORT}; Destination Port: {self.DST_PORT}; Sequence: {self.SEQ_NUM}; ACK: {self.ACK_NUM}; Flags: {flags} ]"
+        return f"[ TCP - Source Port: {self.SRC_PORT}; Destination Port: {self.DST_PORT}; Sequence: {self.SEQ_NUM}; ACK: {self.ACK_NUM}; Flags: {flags} ]"
+class UDP:
+    ID = 0x11
+    
